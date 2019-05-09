@@ -1,13 +1,13 @@
 const Engine = require('../libjs/engine')
 const redis = require('redis')
-console.log(process.pid)
+console.log(`pid: ${process.pid}`)
 
-const redisCli = redis.createClient([{host: '172.19.3.186', port: 26010, password: '', db: 1}])
-const engine = new Engine([{host: '172.19.3.186', port: 26010, password: '', db: 1}], redisCli)
+const redisCli = redis.createClient([{host: 'localhost', port: 6379, password: '', db: 1}])
+const engine = new Engine([{host: 'localhost', port: 6379, password: '', db: 1}], redisCli)
 
 const numMap = {
-  rule: 10000,
-  event: 10000
+  rule: 2,
+  event: 10
 }
 const each = 100
 async function sleep (time) {
@@ -36,7 +36,7 @@ async function main () {
         .catch(err => {
           console.log(`Submit Event Error: ${err}`)
         })
-      console.log(`index: ${i} param1: ${param1} param: ${param} ret: ${ret} target: ${target} emit: ${emit}`)
+      console.log(`index: ${i} param1: ${param1} param: ${param} ret: ${ret} target: ${target}`)
     }
     console.timeEnd('run')
     console.log(`emit ${j} times`)
@@ -107,9 +107,42 @@ async function main () {
     })
     console.log(`test fact ${ret} ${ret1} ${ret2} ${ret3}`)
   }
-
-  await addRules()
-  await testEvent()
+  async function test1 () {
+    await engine.addRule('test1', {
+      'test1$state': {
+        "start": {
+          "r0": {
+            "all": [{
+              "m": {
+                "$gt": {
+                  "param": 50
+                }
+              }
+            }],
+            "all": [{
+              "m": {
+                "$lt": {
+                  "param1": 50
+                }
+              }
+            }],
+            "to": "emit",
+            "run": "emit"
+          }
+        }
+      }
+    })
+    // await sleep(6 * 1000)
+    // await engine.ensureRuleset('test1')
+    const r1 = await engine.submitEvent('test1', { param: 60, param1: 6 })
+    const r2 = await engine.submitFact('test1', { param: 60, sid: 1 })
+    const r3 = await engine.submitFact('test1', { param1: 6, sid: 1 })
+    engine.host.deleteState('test1', 1)
+    const r4 = await engine.submitFact('test1', { param: 6, sid: 1 })
+    const r5 = await engine.submitFact('test1', { param: 60, sid: 1 })
+    console.log(`${engine.host.getState('test1', 1)} ${r1} ${r2} ${r3} ${r4} ${r5}`)
+  }
+  await test1()
 }
 
 main()

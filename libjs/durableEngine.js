@@ -1122,34 +1122,10 @@ exports = module.exports = durableEngine = function () {
             throw 'Action ' + actionName + ' not found';
         };
 
-        that.deleteRuleset = function (rulesetName, complete) {
-            try {
-                var rules = rulesDirectory[rulesetName];
-                if (!rules) {
-                    throw 'Ruleset ' + rulesetName + ' not found';
-                } else {
-                    delete rulesDirectory[rulesetName];
-                   // remove hset key in redis db
-                    db.hgetall(rulesetName + '!c', function (err, pairKeyValues) {
-                        for (var key in pairKeyValues) {
-                            db.hdel(rulesetName + '!c', key, redis.print);
-                        }
-                    });
-                    db.hgetall(rulesetName + '!p', function (err, pairKeyValues) {
-                        for (var key in pairKeyValues) {
-                            db.hdel(rulesetName + '!p', key, redis.print);
-                        }
-                    });
-                    db.hgetall(rulesetName + '!s', function (err, pairKeyValues) {
-                        for (var key in pairKeyValues) {
-                            db.hdel(rulesetName + '!s', key, redis.print);
-                        }
-                    });
-                    complete(null, true);
-                }
-            } catch (reason) {
-                complete(reason);
-            }
+        that.deleteRuleset = function (rulesetName) {
+            var rules = rulesDirectory[rulesetName];
+            // delete rulesDirectory[rulessetName]
+            that.getRuleset(rulesetName).deleteRuleset()
         }
 
         that.loadRuleset = function (rulesetName, complete) {

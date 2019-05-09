@@ -1,6 +1,6 @@
 {
-  "name": "durable",
-  "version": "0.36.93",
+  "name": "durable-node",
+  "version": "0.0.1",
   "description": "A lightweight rules engine for real-time, consistent and scalable coordination of events.",
   "keywords": [
     "business rules",
@@ -23,9 +23,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/jruizgit/rules"
+    "url": "http://github.com/leoDreamer/rules"
   },
-  "main": "./libjs/durable",
+  "main": "./libjs/engine",
   "scripts": {
     "install": "node-gyp rebuild"
   },
@@ -36,7 +36,7 @@
     "npm": "2.5.x"
   },
   "author": {
-    "name": "Jesus Ruiz",
-    "email": "jr3791@live.com"
+    "name": "Leo",
+    "email": "leolichuan@qq.com"
   }
 }
